@@ -1,0 +1,192 @@
+<link rel="stylesheet" href="../style.css"/>
+
+<a class="topmenu" href="../index.html#about-me">About Me</a>
+<a class="topmenu" href="../index.html#skills">Skills</a>
+<a class="topmenu" href="../index.html#projects">Projects</a>
+<a class="topmenu" href="../index.html#recommendations">Recommendations</a>
+<a class="topmenu" href="../blog.html">Blog</a>
+
+<section class="blog-page">
+  <div class="blog-hero">
+    <h1>Hoozah</h1>
+    <p>Basic Mosquitto broker setup for testing MQTT with an ESP32.</p>
+  </div>
+
+  <article class="blog-card">
+    <h2>What is MQTT?</h2>
+
+    <p>
+      MQTT stands for Message Queuing Telemetry Transport. It is a lightweight publish and subscribe
+      messaging protocol often used in IoT systems. It is useful when devices need to send small
+      messages efficiently, especially on low-power devices or unreliable networks.
+    </p>
+
+    <p>
+      MQTT uses three main roles: broker, publisher, and subscriber. The broker is the middle server
+      that receives messages and sorts them by topic. A publisher sends data to a topic. A subscriber
+      listens to a topic and receives messages from the broker.
+    </p>
+
+    <p>
+      I think of it like subscribing to a YouTube channel. The publisher posts something, the broker
+      organises it under a topic, and the subscriber receives updates for the topic it subscribed to. The topology can be seen below:
+    </p>
+
+    <!-- comment: MQTT Broker Publisher and Subscriber Diagram -->
+    <div class="mqtt-diagram">
+      <svg viewBox="0 0 900 260" role="img" aria-label="Basic MQTT publish and subscribe diagram">
+        <rect x="40" y="80" width="190" height="90" rx="15"></rect>
+        <text x="135" y="115" text-anchor="middle">ESP32</text>
+        <text x="135" y="145" text-anchor="middle">Publisher</text>
+
+        <rect x="355" y="70" width="190" height="110" rx="15"></rect>
+        <text x="450" y="115" text-anchor="middle">Mosquitto</text>
+        <text x="450" y="145" text-anchor="middle">MQTT Broker</text>
+
+        <rect x="670" y="80" width="190" height="90" rx="15"></rect>
+        <text x="765" y="115" text-anchor="middle">Laptop / Phone</text>
+        <text x="765" y="145" text-anchor="middle">Subscriber</text>
+
+        <line x1="230" y1="125" x2="355" y2="125"></line>
+        <text x="292" y="105" text-anchor="middle">publish</text>
+        <text x="292" y="155" text-anchor="middle">esp32/temp</text>
+
+        <line x1="545" y1="125" x2="670" y2="125"></line>
+        <text x="607" y="105" text-anchor="middle">subscribe</text>
+        <text x="607" y="155" text-anchor="middle">esp32/temp</text>
+      </svg>
+    </div>
+
+    <p>
+      I wanted to test MQTT with an ESP32 microcontroller. My goal was to publish data from the ESP32
+      like it's status and later control an LED based on messages received from a subscribed MQTT topic. In later versions I may write up on adding a sensor and publishing it's data but for now let's keep it simple. 
+    </p>
+
+    <p>
+      To do this, I needed an MQTT broker running on my Debian Server. This can be done on most Debian-based systems like Ubuntu that have MQTT packages. The ESP32 would connect to the
+      broker, publish sensor data to one topic, and subscribe to another topic for control messages.
+    </p>
+
+    <h2>Installing Mosquitto on Ubuntu Server</h2>
+
+    <p>
+      I used Mosquitto as the MQTT broker. Mosquitto is available from the Ubuntu repositories, so it
+      can be installed using apt.
+    </p>
+
+    <pre><code>sudo apt update
+sudo apt install mosquitto mosquitto-clients -y</code></pre>
+
+    <p>Then I started the Mosquitto service and enabled it to start automatically:</p>
+
+    <pre><code>sudo systemctl start mosquitto
+sudo systemctl enable mosquitto
+sudo systemctl status mosquitto</code></pre>
+
+    <h2>Testing publish and subscribe locally</h2>
+
+    <p>
+      I opened two terminals. In the first terminal, I subscribed to a test topic:
+    </p>
+
+    <pre><code>mosquitto_sub -h localhost -t "test_topic" -v</code></pre>
+
+    <p>
+      In the second terminal, I published a test message:
+    </p>
+
+    <pre><code>mosquitto_pub -h localhost -t "test_topic" -m "Testing"</code></pre>
+
+    <p>
+      If everything works, the subscriber terminal should show the message.
+    </p>
+
+    <h2>Allowing other devices on my network to connect</h2>
+
+    <p>
+      Localhost only tests the broker from the same machine. To connect from another device, like a
+      phone, laptop, or ESP32, the broker needs to listen on the network.
+    </p>
+
+    <p>
+      I created a custom Mosquitto config file inside:
+    </p>
+
+    <pre><code>/etc/mosquitto/conf.d/</code></pre>
+
+    <p>
+      For testing, I created:
+    </p>
+
+    <pre><code>sudo nano /etc/mosquitto/conf.d/test.conf</code></pre>
+
+    You will need your server Ip address on your network, which can be found by running: hostname -I or ip -4 addr.
+
+
+    <p>
+      Then I added:
+    </p>
+
+    <pre><code>listener 1883 <ip address of the server>>
+allow_anonymous true</code></pre>
+
+    <p>
+      This opens MQTT port 1883 on the server for testing. Anonymous access is convenient for a testing and
+      setup
+    </p>
+
+    <p>
+      After changing the config, I restarted Mosquitto:
+    </p>
+
+    <pre><code>sudo systemctl restart mosquitto
+sudo systemctl status mosquitto</code></pre>
+
+    <h2>Finding the debian Server IP address</h2>
+
+    <p>
+      To connect from another device, I needed the IP address of the Debian Server:
+    </p>
+
+    <pre><code>hostname -I</code></pre>
+
+    <p>
+      or:
+    </p>
+
+    <pre><code>ip -4 addr</code></pre>
+
+    <p>
+      For example, if the server IP is 192.168.1.83, then MQTTX, MyMQTT, Node-RED, or an ESP32 can use
+      that address as the broker address.
+    </p>
+
+    <h2>Testing with MQTTX and Node-RED</h2>
+
+    <p>
+      After local testing worked, I used MQTTX to create a connection to the broker using the Debian
+      Server IP address. I subscribed to a topic and published test messages to confirm that messages
+      could travel across the network.
+    </p>
+
+    <p>
+      Node-RED useful because it lets me build simple flows visually instead
+      of typing every command manually. For example, an MQTT input node can receive sensor data and
+      another node can format it into JSON before sending it to a dashboard, database, or another API.
+    </p>
+
+    <h2>What I learned</h2>
+
+    <p>
+      The main idea I learned is that MQTT separates devices from each other. The ESP32 does not need
+      to know every device that wants the data. It only needs to publish to a topic. Any subscriber
+      interested in that topic can receive the data through the broker. I had many issues accessing the MQTT ip, initially this was done on a Debian VM which was configured to block inbound traffic connections, this was resolved by setting it to a bridged network state where the VM connected to the Virtual Box software ip routed to the device NIC. 
+    </p>
+
+    <p>
+      The next improvement would be adding usernames, passwords, firewall rules, and eventually TLS.
+    </p>
+  </article>
+
+  <h2>Stay Tuned for a continuation!</h2>
+</section>
