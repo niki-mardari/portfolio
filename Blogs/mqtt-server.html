@@ -1,24 +1,182 @@
-<link rel="stylesheet" href="../style.css"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MQTT and Microcontrollers - Niki Mardari</title>
 
-<a class="topmenu" href="../index.html#about-me">About Me</a>
-<a class="topmenu" href="../index.html#skills">Skills</a>
-<a class="topmenu" href="../index.html#projects">Projects</a>
-<a class="topmenu" href="../index.html#recommendations">Recommendations</a>
-<a class="topmenu" href="../blog.html">Blog</a>
+  <!-- This page is inside the Blogs folder, so paths must go up one level using ../ -->
+  <link rel="stylesheet" href="../style.css"/>
 
-<section class="blog-page">
-  <div class="blog-hero">
-    <h1>Hoozah</h1>
-    <p>Basic Mosquitto broker setup for testing MQTT with an ESP32.</p>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script src="../config.js"></script>
+  <script src="../script.js" defer></script>
+
+  <style>
+    .article-page {
+      padding: 80px 10% 60px;
+    }
+
+    .article-hero {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .article-hero h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .article-hero p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .article-card {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 42px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      line-height: 1.75;
+    }
+
+    .article-card h2 {
+      font-size: 30px;
+      margin-top: 38px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #d9d9d9;
+      padding-bottom: 10px;
+    }
+
+    .article-card h2:first-child {
+      margin-top: 0;
+    }
+
+    .article-card p {
+      font-size: 17px;
+      margin-bottom: 18px;
+    }
+
+    .article-card a {
+      font-weight: 700;
+    }
+
+    .blog-article-image {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      display: block;
+      margin: 24px auto 8px;
+      border-radius: 14px;
+      background: #f7f7f7;
+    }
+
+    figure {
+      margin: 30px 0;
+    }
+
+    figcaption {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .code-block {
+      margin: 22px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #d8d8d8;
+      background: #1f2933;
+    }
+
+    .code-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #4f6f8f;
+      color: white;
+      font-weight: 700;
+    }
+
+    .code-title button {
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 18px;
+      overflow-x: auto;
+      background: #1f2933;
+    }
+
+    .code-block code {
+      color: #f4f4f4;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 14px;
+      white-space: pre;
+    }
+
+    .note-box {
+      border-left: 5px solid #4f6f8f;
+      padding: 14px 18px;
+      background: #f3f7fb;
+      margin: 24px 0;
+      border-radius: 8px;
+    }
+
+    .back-to-blog {
+      display: inline-block;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Navigation Bar -->
+<nav>
+  <div id="home">
+    <div class="profile_name">
+      Niki Mardari
+    </div>
+
+    <div class="topdiv">
+      <a class="topmenu" href="../index.html#about-me">About Me</a>
+      <a class="topmenu" href="../index.html#skills">Skills</a>
+      <a class="topmenu" href="../index.html#projects">Projects</a>
+      <a class="topmenu" href="../index.html#recommendations">Recommendations</a>
+      <a class="topmenu" href="../blog.html">Blog</a>
+    </div>
+  </div>
+</nav>
+
+<section class="article-page">
+  <div class="article-hero">
+    <h1>MQTT and Microcontrollers</h1>
+    <p>Basic Mosquitto setup on Debian Server and a simple ESP32 LED test.</p>
   </div>
 
-  <article class="blog-card">
+  <article class="article-card">
+    <a href="../blog.html" class="back-to-blog">← Back to Blog</a>
+
     <h2>What is MQTT?</h2>
 
     <p>
       MQTT stands for Message Queuing Telemetry Transport. It is a lightweight publish and subscribe
-      messaging protocol often used in IoT systems. It is useful when devices need to send small
-      messages efficiently, especially on low-power devices or unreliable networks.
+      messaging protocol that is often used in IoT systems. It is useful when small devices need to
+      send simple messages without using a large amount of data.
     </p>
 
     <p>
@@ -29,164 +187,444 @@
 
     <p>
       I think of it like subscribing to a YouTube channel. The publisher posts something, the broker
-      organises it under a topic, and the subscriber receives updates for the topic it subscribed to. The topology can be seen below:
+      organises it under a topic, and the subscriber receives updates for the topic it subscribed to.
+      The official MQTT website is useful if you want to learn more:
+      <a href="https://mqtt.org/" target="_blank">mqtt.org</a>.
     </p>
 
-    <!-- comment: MQTT Broker Publisher and Subscriber Diagram -->
-    <div class="mqtt-diagram">
-      <svg viewBox="0 0 900 260" role="img" aria-label="Basic MQTT publish and subscribe diagram">
-        <rect x="40" y="80" width="190" height="90" rx="15"></rect>
-        <text x="135" y="115" text-anchor="middle">ESP32</text>
-        <text x="135" y="145" text-anchor="middle">Publisher</text>
+    <h2>What I wanted to build</h2>
 
-        <rect x="355" y="70" width="190" height="110" rx="15"></rect>
-        <text x="450" y="115" text-anchor="middle">Mosquitto</text>
-        <text x="450" y="145" text-anchor="middle">MQTT Broker</text>
+    <p>
+      I wanted to test MQTT with an ESP32 microcontroller. The goal was simple: publish a status
+      message from the ESP32 and send commands back to turn the onboard LED on and off.
+    </p>
 
-        <rect x="670" y="80" width="190" height="90" rx="15"></rect>
-        <text x="765" y="115" text-anchor="middle">Laptop / Phone</text>
-        <text x="765" y="145" text-anchor="middle">Subscriber</text>
+    <p>
+      This was useful because it gave me a basic end-to-end test. The Debian Server acted as the MQTT
+      broker, MQTTX acted as my test client, and the ESP32 acted as the embedded device.
+    </p>
 
-        <line x1="230" y1="125" x2="355" y2="125"></line>
-        <text x="292" y="105" text-anchor="middle">publish</text>
-        <text x="292" y="155" text-anchor="middle">esp32/temp</text>
+    <figure>
+      <img src="./images/Esp32.jpg" alt="ESP32 DevKit used for MQTT testing" class="blog-article-image">
+      <figcaption>The ESP32 DevKit was used as the microcontroller for the MQTT test.</figcaption>
+    </figure>
 
-        <line x1="545" y1="125" x2="670" y2="125"></line>
-        <text x="607" y="105" text-anchor="middle">subscribe</text>
-        <text x="607" y="155" text-anchor="middle">esp32/temp</text>
-      </svg>
+    <h2>Step 1: Install Mosquitto</h2>
+
+    <p>
+      I used Mosquitto as the MQTT broker. On Debian Server, I installed Mosquitto and the client tools
+      using apt.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Install Mosquitto</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>sudo apt update
+sudo apt install mosquitto mosquitto-clients -y</code></pre>
+</div>
+
+    <p>
+      Then I started Mosquitto and enabled it to start when the server boots.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Start Mosquitto</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>sudo systemctl start mosquitto
+sudo systemctl enable mosquitto
+sudo systemctl status mosquitto</code></pre>
+</div>
+
+    <h2>Step 2: Test MQTT locally</h2>
+
+    <p>
+      Before using the ESP32, I tested publish and subscribe locally. I opened two terminals.
+      In the first terminal, I subscribed to a test topic.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Subscribe to a test topic</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>mosquitto_sub -h localhost -t &quot;test_topic&quot; -v</code></pre>
+</div>
+
+    <p>
+      In the second terminal, I published a message to that topic.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Publish a test message</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>mosquitto_pub -h localhost -t &quot;test_topic&quot; -m &quot;Testing&quot;</code></pre>
+</div>
+
+    <p>
+      If everything is working, the subscriber terminal should print the message.
+    </p>
+
+    <h2>Step 3: Create a test Mosquitto config</h2>
+
+    <p>
+      To allow other devices on my network to connect, I created a simple config file in the Mosquitto
+      configuration folder.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Create config file</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>sudo nano /etc/mosquitto/conf.d/test.conf</code></pre>
+</div>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>test.conf</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>listener 1883 0.0.0.0
+allow_anonymous true</code></pre>
+</div>
+
+    <div class="note-box">
+      <p>
+        This is okay for local testing on my own network, but I would not expose this to the public
+        internet. For a real setup I would add authentication, firewall rules, and later TLS.
+      </p>
     </div>
 
     <p>
-      I wanted to test MQTT with an ESP32 microcontroller. My goal was to publish data from the ESP32
-      like it's status and later control an LED based on messages received from a subscribed MQTT topic. In later versions I may write up on adding a sensor and publishing it's data but for now let's keep it simple. 
+      For testing, I launched Mosquitto with my custom config file using this command.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Launch Mosquitto with custom config</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>sudo mosquitto -c /etc/mosquitto/conf.d/test.conf</code></pre>
+</div>
+
+    <p>
+      If port 1883 is already in use, stop the service first and then run the command again.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>If port 1883 is already in use</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>sudo systemctl stop mosquitto
+sudo mosquitto -c /etc/mosquitto/conf.d/test.conf</code></pre>
+</div>
+
+    <figure>
+      <img src="./images/MQTT_Debian.png" alt="Mosquitto broker running on Linux server" class="blog-article-image">
+      <figcaption>Mosquitto running with the custom test configuration.</figcaption>
+    </figure>
+
+    <h2>Step 4: Find the server IP address</h2>
+
+    <p>
+      The ESP32 needs to know the IP address of the MQTT broker. I used this command to get the server IP.
+    </p>
+
+    <div class="code-block">
+  <div class="code-title">
+    <span>Find server IP address</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>hostname -I
+ip -4 addr</code></pre>
+</div>
+
+    <p>
+      The value I needed was the IPv4 address of the server on my local network. The ESP32 and my laptop
+      need to be on the same network for this simple test.
+    </p>
+
+    <h2>Step 5: Test with MQTTX</h2>
+
+    <p>
+      I used MQTTX as a visual MQTT client. It let me connect to the broker, subscribe to topics, and
+      publish messages without typing every command manually. The official MQTTX download page is here:
+      <a href="https://mqttx.app/downloads" target="_blank">mqttx.app/downloads</a>.
     </p>
 
     <p>
-      To do this, I needed an MQTT broker running on my Debian Server. This can be done on most Debian-based systems like Ubuntu that have MQTT packages. The ESP32 would connect to the
-      broker, publish sensor data to one topic, and subscribe to another topic for control messages.
+      In MQTTX, I created a new connection using the server IP address and port 1883. Then I subscribed
+      to the telemetry topic and published commands to the command topic.
     </p>
 
-    <h2>Installing Mosquitto on Ubuntu Server</h2>
+    <div class="code-block">
+  <div class="code-title">
+    <span>Topics used</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>esp32/devkit/telemetry
+esp32/devkit/command</code></pre>
+</div>
+
+    <figure>
+      <img src="./images/MQTTX.png" alt="MQTTX connection setup" class="blog-article-image">
+      <figcaption>MQTTX was used to test the connection before and after connecting the ESP32.</figcaption>
+    </figure>
+
+    <h2>Step 6: ESP32 MQTT LED code</h2>
 
     <p>
-      I used Mosquitto as the MQTT broker. Mosquitto is available from the Ubuntu repositories, so it
-      can be installed using apt.
+      The ESP32 connects to Wi-Fi, connects to the MQTT broker, publishes a message every two seconds,
+      and listens for LED commands. Sending <strong>ON</strong> to the command topic turns the LED on.
+      Sending <strong>OFF</strong> turns it off.
     </p>
 
-    <pre><code>sudo apt update
-sudo apt install mosquitto mosquitto-clients -y</code></pre>
+    <div class="code-block">
+  <div class="code-title">
+    <span>ESP32 MQTT LED test</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>// Simple MQTT and LED on/off on an Esp32 Devkit
+#include &lt;WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
 
-    <p>Then I started the Mosquitto service and enabled it to start automatically:</p>
+// Onboard LED
+#define LED_PIN 2
 
-    <pre><code>sudo systemctl start mosquitto
-sudo systemctl enable mosquitto
-sudo systemctl status mosquitto</code></pre>
+// Networking parameters
+const char* ssid = &quot;&quot;;
+const char* password = &quot;&quot;;
+const char* mqtt_server = &quot;&quot;; // Address of MQTT server
+const char* command_topic = &quot;esp32/devkit/command&quot;; // Command topic
+const char* telemetry_topic = &quot;esp32/devkit/telemetry&quot;; // Telemetry topic
 
-    <h2>Testing publish and subscribe locally</h2>
+// Create Wi-Fi and MQTT objects
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+// Message buffer
+#define MSG_BUFFER_SIZE (50)
+char msg[MSG_BUFFER_SIZE];
+
+// Timings
+unsigned long lastMsg = 0;
+int value = 0;
+
+// Wi-Fi
+void setup_wifi() {
+  delay(10);
+
+  Serial.println();
+  Serial.print(&quot;Connecting to &quot;);
+  Serial.println(ssid);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(&quot;.&quot;);
+  }
+
+  randomSeed(micros()); // For client ID in reconnect
+
+  Serial.println(&quot;&quot;);
+  Serial.println(&quot;WiFi connected&quot;);
+  Serial.print(&quot;IP address: &quot;);
+  Serial.println(WiFi.localIP());
+  Serial.print(&quot;MAC Address: &quot;);
+  Serial.println(WiFi.macAddress());
+}
+
+// PubSubClient callback function
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print(&quot;Message arrived [&quot;);
+  Serial.print(topic);
+  Serial.print(&quot;] &quot;);
+
+  // Print incoming payload message to Serial Monitor
+  for (int i = 0; i &lt; length; i++) {
+    Serial.print((char)payload[i]);
+  }
+
+  Serial.println();
+
+  // Command handlers
+  if (strcmp(topic, command_topic) == 0) {
+    if (length == 2 &amp;&amp;
+        payload[0] == &#x27;O&#x27; &amp;&amp;
+        payload[1] == &#x27;N&#x27;) {
+
+      digitalWrite(LED_PIN, HIGH);
+      Serial.println(&quot;LED turned ON&quot;);
+    }
+
+    else if (length == 3 &amp;&amp;
+             payload[0] == &#x27;O&#x27; &amp;&amp;
+             payload[1] == &#x27;F&#x27; &amp;&amp;
+             payload[2] == &#x27;F&#x27;) {
+
+      digitalWrite(LED_PIN, LOW);
+      Serial.println(&quot;LED turned OFF&quot;);
+    }
+  }
+}
+
+void reconnect() {
+  // Loop until we are reconnected
+  while (!client.connected()) {
+    Serial.print(&quot;Attempting MQTT connection...&quot;);
+
+    // Create a unique, random client ID
+    String clientId = &quot;Esp32-&quot;;
+    clientId += String(random(0xffff), HEX);
+
+    // Attempt to connect without username/password for local testing
+    if (client.connect(clientId.c_str())) {
+      Serial.println(&quot;connected&quot;);
+
+      // Once connected, publish an announcement
+      client.publish(telemetry_topic, &quot;hello world from Esp32!&quot;);
+
+      // Subscribe to command topic
+      client.subscribe(command_topic);
+    } else {
+      Serial.print(&quot;failed, rc=&quot;);
+      Serial.print(client.state());
+      Serial.println(&quot; trying again in 5 seconds&quot;);
+
+      delay(5000);
+    }
+  }
+}
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  Serial.begin(115200);
+  setup_wifi();
+
+  // Connect to the broker on standard MQTT port 1883
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+}
+
+void loop() {
+  if (!client.connected()) {
+    reconnect();
+  }
+
+  client.loop();
+
+  // Publish a payload message roughly every 2 seconds
+  unsigned long now = millis();
+
+  if (now - lastMsg &gt; 2000) {
+    lastMsg = now;
+    ++value;
+
+    snprintf(msg, MSG_BUFFER_SIZE, &quot;I am alive! #%d&quot;, value);
+
+    Serial.print(&quot;Publish message: &quot;);
+    Serial.println(msg);
+
+    client.publish(telemetry_topic, msg);
+  }
+}</code></pre>
+</div>
+
+    <h2>Step 7: Send LED commands</h2>
 
     <p>
-      I opened two terminals. In the first terminal, I subscribed to a test topic:
+      After flashing the ESP32, I could send commands from MQTTX. I could also test the same thing from
+      the terminal using Mosquitto clients.
     </p>
 
-    <pre><code>mosquitto_sub -h localhost -t "test_topic" -v</code></pre>
+    <div class="code-block">
+  <div class="code-title">
+    <span>Subscribe to ESP32 telemetry</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>mosquitto_sub -h &lt;broker-ip&gt; -t &quot;esp32/devkit/telemetry&quot; -v</code></pre>
+</div>
 
-    <p>
-      In the second terminal, I published a test message:
-    </p>
+    <div class="code-block">
+  <div class="code-title">
+    <span>Turn LED on and off</span>
+    <button type="button" onclick="copyCodeBlock(this)">Copy</button>
+  </div>
+  <pre><code>mosquitto_pub -h &lt;broker-ip&gt; -t &quot;esp32/devkit/command&quot; -m &quot;ON&quot;
+mosquitto_pub -h &lt;broker-ip&gt; -t &quot;esp32/devkit/command&quot; -m &quot;OFF&quot;</code></pre>
+</div>
 
-    <pre><code>mosquitto_pub -h localhost -t "test_topic" -m "Testing"</code></pre>
-
-    <p>
-      If everything works, the subscriber terminal should show the message.
-    </p>
-
-    <h2>Allowing other devices on my network to connect</h2>
-
-    <p>
-      Localhost only tests the broker from the same machine. To connect from another device, like a
-      phone, laptop, or ESP32, the broker needs to listen on the network.
-    </p>
-
-    <p>
-      I created a custom Mosquitto config file inside:
-    </p>
-
-    <pre><code>/etc/mosquitto/conf.d/</code></pre>
-
-    <p>
-      For testing, I created:
-    </p>
-
-    <pre><code>sudo nano /etc/mosquitto/conf.d/test.conf</code></pre>
-
-    You will need your server Ip address on your network, which can be found by running: hostname -I or ip -4 addr.
-
-
-    <p>
-      Then I added:
-    </p>
-
-    <pre><code>listener 1883 <ip address of the server>>
-allow_anonymous true</code></pre>
-
-    <p>
-      This opens MQTT port 1883 on the server for testing. Anonymous access is convenient for a testing and
-      setup
-    </p>
-
-    <p>
-      After changing the config, I restarted Mosquitto:
-    </p>
-
-    <pre><code>sudo systemctl restart mosquitto
-sudo systemctl status mosquitto</code></pre>
-
-    <h2>Finding the debian Server IP address</h2>
-
-    <p>
-      To connect from another device, I needed the IP address of the Debian Server:
-    </p>
-
-    <pre><code>hostname -I</code></pre>
-
-    <p>
-      or:
-    </p>
-
-    <pre><code>ip -4 addr</code></pre>
-
-    <p>
-      For example, if the server IP is 192.168.1.83, then MQTTX, MyMQTT, Node-RED, or an ESP32 can use
-      that address as the broker address.
-    </p>
-
-    <h2>Testing with MQTTX and Node-RED</h2>
-
-    <p>
-      After local testing worked, I used MQTTX to create a connection to the broker using the Debian
-      Server IP address. I subscribed to a topic and published test messages to confirm that messages
-      could travel across the network.
-    </p>
-
-    <p>
-      Node-RED useful because it lets me build simple flows visually instead
-      of typing every command manually. For example, an MQTT input node can receive sensor data and
-      another node can format it into JSON before sending it to a dashboard, database, or another API.
-    </p>
+    <figure>
+      <img src="./images/Test_With_MQTTX.jpg" alt="MQTTX test showing ESP32 LED command working" class="blog-article-image">
+      <figcaption>Final test: MQTTX sending commands and the ESP32 responding.</figcaption>
+    </figure>
 
     <h2>What I learned</h2>
 
     <p>
-      The main idea I learned is that MQTT separates devices from each other. The ESP32 does not need
-      to know every device that wants the data. It only needs to publish to a topic. Any subscriber
-      interested in that topic can receive the data through the broker. I had many issues accessing the MQTT ip, initially this was done on a Debian VM which was configured to block inbound traffic connections, this was resolved by setting it to a bridged network state where the VM connected to the Virtual Box software ip routed to the device NIC. 
+      The main thing I learned is that MQTT separates devices from each other. The ESP32 does not need
+      to know every device that wants the data. It only publishes to a topic. Anything interested in
+      that topic can subscribe through the broker.
     </p>
 
     <p>
-      The next improvement would be adding usernames, passwords, firewall rules, and eventually TLS.
+      This was a simple test, but it gave me a working base for future IoT projects. The next step would
+      be to add sensor data, proper authentication, and a safer broker configuration.
     </p>
   </article>
-
-  <h2>Stay Tuned for a continuation!</h2>
 </section>
+
+<!-- Scroll to Top Button -->
+<div class="iconbutton">
+  <a href="#home">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" width="50px">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 11.25l-3-3m0 0l-3 3m3-3v7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  </a>
+</div>
+
+<!-- Footer -->
+<footer>
+  <h1 class="visits">This site has been visited <span id="visits"></span> times.</h1>
+
+  <div class="social-media-banners">
+    <a href="https://www.instagram.com/nick23019/" target="_blank" class="fa fa-instagram"></a>
+    <a href="https://www.youtube.com/@Pengui23" target="_blank" class="fa fa-youtube"></a>
+    <a href="https://www.snapchat.com/add/yourusername" target="_blank" class="fa fa-snapchat-ghost"></a>
+  </div>
+
+  <div style="margin-top: 10px;">
+    © 2025 Niki Mardari |
+    <a href="https://www.linkedin.com/in/niki-mardari-5909941a4/" target="_blank">LinkedIn</a>
+  </div>
+</footer>
+
+<script>
+  function copyCodeBlock(button) {
+    const codeBlock = button.closest(".code-block");
+    const code = codeBlock.querySelector("code").innerText;
+
+    navigator.clipboard.writeText(code).then(() => {
+      const originalText = button.textContent;
+      button.textContent = "Copied";
+
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 1200);
+    });
+  }
+</script>
+
+</body>
+</html>

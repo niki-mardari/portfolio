@@ -2,17 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Blog</title>
+  <title>Blog - Niki Mardari</title>
 
   <link rel="stylesheet" href="./style.css"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
   <script src="./config.js"></script>
   <script src="./script.js" defer></script>
 
+  <style>
+    .blog-page {
+      padding: 80px 10% 60px;
+    }
+
+    .blog-hero {
+      text-align: center;
+      margin-bottom: 45px;
+    }
+
+    .blog-hero h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .blog-list {
+      display: flex;
+      justify-content: center;
+    }
+
+    .blog-preview-card {
+      width: 100%;
+      max-width: 720px;
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .blog-preview-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    .blog-preview-image {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .blog-preview-content {
+      padding: 28px;
+    }
+
+    .blog-preview-content h2 {
+      font-size: 32px;
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .blog-preview-content p {
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .read-more {
+      font-weight: 700;
+    }
+  </style>
 </head>
 
 <body>
@@ -38,23 +103,25 @@
 <section id="blog" class="blog-page">
   <div class="blog-hero">
     <h1>Blog</h1>
+    <p>Project write-ups, learning notes, and small engineering experiments.</p>
   </div>
 
-<div class="blog-list">
-  <a href="./Blogs/mqtt-server.html" class="blog-preview-card">
-    <img src="./Blogs/images/mqtt.png" alt="MQTT setup with ESP32" class="blog-preview-image">
+  <div class="blog-list">
+    <a href="./Blogs/mqtt-server.html" class="blog-preview-card">
+      <img src="./Blogs/images/mqtt.png" alt="MQTT setup with ESP32" class="blog-preview-image">
 
-    <div class="blog-preview-content">
-      <h2>MQTT and Microcontrollers</h2>
+      <div class="blog-preview-content">
+        <h2>MQTT and Microcontrollers</h2>
 
-      <p>
-        Explore the basics of MQTT and how it can be used with microcontrollers. In this blog I go through configuring  MQTT communication with an Esp32 microcontroller.
-      </p>
+        <p>
+          Explore the basics of MQTT and how it can be used with microcontrollers. 
+          In this blog I go through configuring  MQTT communication with an Esp32 microcontroller.
+        </p>
 
-      <span class="read-more">Read article →</span>
-    </div>
-  </a>
-</div>
+        <span class="read-more">Read article →</span>
+      </div>
+    </a>
+  </div>
 </section>
 
 <!-- Scroll to Top Button -->
