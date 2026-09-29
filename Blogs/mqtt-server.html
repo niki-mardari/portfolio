@@ -476,7 +476,7 @@ mosquitto_pub -h &lt;broker-ip-address&gt; -t &quot;esp32/devkit/command&quot; -
     <h2>What I learned</h2>
     <p>The main thing I learned was that MQTT separates devices from each other. The ESP32 does not need to know every device that wants the data. It only publishes to a topic. Anything interested in that topic can subscribe through the broker.</p>
     <p>I also learned more about Mosquitto configuration and Linux permissions. The password file problem was useful because it showed me that services often run as their own user, so file ownership and permissions matter.</p>
-    <p>This was a simple test, but it gave me a working base for future IoT projects. The next step would be to improve the security setup further and build a more complete sensor/control system.</p>
+    <p>This was a simple test, but it gave me a working base for future IoT projects. The next step would be to add TLS and encryption, and build a more complex system. Stay tuned for updates!</p>
   </article>
 </section>
 
